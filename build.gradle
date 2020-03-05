@@ -64,13 +64,13 @@ dependencies {
     implementation "com.google.code.gson:gson:2.8.5"
 
 
-    implementation project(path: ':utils')
+    implementation project(path: ':annotation_preprocessor')
 
     //Kenvix Annotation Preprocessor
     //for Kotlin Projects
-    kapt project(':utils')
+    kapt project(':annotation_preprocessor')
     //for Java and Kotlin Projects
-    annotationProcessor project(':utils')
+    annotationProcessor project(':annotation_preprocessor')
 }
 
 kapt {
