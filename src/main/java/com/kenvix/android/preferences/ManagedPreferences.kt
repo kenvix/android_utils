@@ -15,17 +15,17 @@ import kotlin.reflect.KProperty
 /**
  * Managed Android Preference
  * @author Kenvix Zure
- * @param name Android Preferences name
- * @param mode Android Preferences access mode
+ * @param preferenceName Android Preferences name
+ * @param preferenceAccessMode Android Preferences access mode
  */
 @Keep
 @Suppress("UNCHECKED_CAST", "unused")
-open class ManagedPreferences(val name: String, val mode: Int = Context.MODE_PRIVATE) {
-    val preferences = ApplicationEnvironment.appContext.getSharedPreferences(name, mode)
-    val editor = preferences.edit()
+open class ManagedPreferences(val preferenceName: String, val preferenceAccessMode: Int = Context.MODE_PRIVATE) {
+    protected val preferences = ApplicationEnvironment.appContext.getSharedPreferences(preferenceName, preferenceAccessMode)
+    protected val preferenceEditor = preferences.edit()
 
-    fun commit() = editor.commit()
-    fun clear() = editor.clear()
+    fun commit() = preferenceEditor.commit()
+    fun clear() = preferenceEditor.clear()
 
     inline fun <reified T> get(key: String, defValue: T?): T {
         return when (T::class) {
@@ -41,12 +41,12 @@ open class ManagedPreferences(val name: String, val mode: Int = Context.MODE_PRI
 
     inline operator fun <reified T> set(key: String, value: T) {
         when (T::class) {
-            Float::class -> editor.putFloat(key, value as Float)
-            Int::class -> editor.putInt(key, value as Int)
-            Long::class -> editor.putLong(key, value as Long)
-            Boolean::class -> editor.putBoolean(key, value as Boolean)
-            String::class -> editor.putString(key, value as String)
-            Set::class -> editor.putStringSet(key, value as Set<String>)
+            Float::class -> preferenceEditor.putFloat(key, value as Float)
+            Int::class -> preferenceEditor.putInt(key, value as Int)
+            Long::class -> preferenceEditor.putLong(key, value as Long)
+            Boolean::class -> preferenceEditor.putBoolean(key, value as Boolean)
+            String::class -> preferenceEditor.putString(key, value as String)
+            Set::class -> preferenceEditor.putStringSet(key, value as Set<String>)
             else -> throw IllegalArgumentException("Type not supported: ${T::class.qualifiedName} on $key")
         }
     }
@@ -65,8 +65,8 @@ open class ManagedPreferences(val name: String, val mode: Int = Context.MODE_PRI
     }
 
     fun applyToPreferenceManager(manager: PreferenceManager) {
-        manager.sharedPreferencesName = this.name
-        manager.sharedPreferencesMode = this.mode
+        manager.sharedPreferencesName = this.preferenceName
+        manager.sharedPreferencesMode = this.preferenceAccessMode
     }
 
     interface DelegatedPreference<T> {
