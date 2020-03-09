@@ -15,14 +15,32 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.kenvix.android.exception.LifecycleEndException;
 import com.kenvix.android.utils.Invoker;
 import com.kenvix.utils.log.Logging;
+
+import org.jetbrains.annotations.NotNull;
+
+import java.util.function.Consumer;
+
+import kotlin.Unit;
+import kotlin.coroutines.CoroutineContext;
+import kotlinx.coroutines.BuildersKt;
+import kotlinx.coroutines.CompletableJob;
+import kotlinx.coroutines.CoroutineScope;
+import kotlinx.coroutines.CoroutineScopeKt;
+import kotlinx.coroutines.CoroutineStart;
+import kotlinx.coroutines.Dispatchers;
+import kotlinx.coroutines.JobKt;
 
 public abstract class BaseActivity extends AppCompatActivity implements Logging, BaseActivitySupport {
     protected FragmentManager fragmentManager;
     private Fragment _foregroundFragment = null;
     private String logTag;
     private BaseActivityUI ui;
+
+    private CompletableJob defaultCoroutineJob = null;
+    private CoroutineScope defaultCoroutineScope = null;
 
     @Override
     public String getLogTag() {
@@ -107,5 +125,34 @@ public abstract class BaseActivity extends AppCompatActivity implements Logging,
      */
     public Fragment getForegroundFragment() {
         return _foregroundFragment;
+    }
+
+    /**
+     * 获取默认 Kotlin Coroutine Job (线程不安全)
+     * @return CompletableJob
+     */
+    @NotNull
+    public CompletableJob getDefaultCoroutineJob() {
+        return defaultCoroutineJob == null ? (defaultCoroutineJob = JobKt.Job(null)) : defaultCoroutineJob;
+    }
+
+    /**
+     * 获取默认 Kotlin Coroutine Scope (线程不安全)
+     * @return CoroutineScope
+     */
+    @NotNull
+    public CoroutineScope getDefaultCoroutineScope() {
+        return defaultCoroutineScope == null ?
+                (defaultCoroutineScope = CoroutineScopeKt.CoroutineScope(Dispatchers.getDefault().plus(getDefaultCoroutineJob())))
+                : defaultCoroutineScope;
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (defaultCoroutineJob != null) {
+            defaultCoroutineJob.cancel(new LifecycleEndException());
+        }
+
+        super.onDestroy();
     }
 }

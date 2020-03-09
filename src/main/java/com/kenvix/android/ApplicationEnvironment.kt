@@ -153,6 +153,11 @@ class ApplicationEnvironment : Application(), Logging {
         Log.d(logTag, "Initialized version: $KenvixAndroidUtilsVersionCode")
     }
 
+    override fun onTerminate() {
+        logger.info("App in Emulator Terminated")
+        super.onTerminate()
+    }
+
     interface UserApplication {
         fun onCreate()
         fun onThreadPoolReject(r: Runnable?, executor: ThreadPoolExecutor?)
