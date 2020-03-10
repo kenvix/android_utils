@@ -145,6 +145,7 @@ class ApplicationEnvironment : Application(), Logging {
             }
 
             NativeCalls.initializeAsync()
+            userApplicationEnvironment?.onCreateAsync()
         }
 
         timer = Timer()
@@ -160,6 +161,7 @@ class ApplicationEnvironment : Application(), Logging {
 
     interface UserApplication {
         fun onCreate()
+        fun onCreateAsync()
         fun onThreadPoolReject(r: Runnable?, executor: ThreadPoolExecutor?)
     }
 }
