@@ -1,5 +1,5 @@
 @file:JvmName("ServiceUtils")
-package com.kenvix.android.utils
+package com.kenvix.android.service.base
 
 import android.content.Context
 import android.content.Context.BIND_AUTO_CREATE

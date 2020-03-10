@@ -45,9 +45,10 @@ open class ManagedPreferences(
     }
 
     fun contains(key: String) = preferences.contains(key)
-    val all get() = preferences.all ?: emptyMap()
+    val all = preferences.all ?: emptyMap<String, Any?>()
 
-    val cachedSerializableObjects: WeakHashMap<String, Serializable> by lazy(LazyThreadSafetyMode.NONE) { WeakHashMap() }
+    val cachedSerializableObjects: WeakHashMap<String, Serializable>
+            by lazy(LazyThreadSafetyMode.NONE) { WeakHashMap<String, Serializable>() }
 
     inline fun <reified T> get(key: String, defValue: T?): T {
         return when (T::class) {

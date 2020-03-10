@@ -4,7 +4,7 @@
 // Written by Kenvix <i@kenvix.com>
 //--------------------------------------------------
 
-package com.kenvix.android.utils
+package com.kenvix.android.service.base
 
 import android.os.Binder
 
