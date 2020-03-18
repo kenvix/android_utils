@@ -1,6 +1,6 @@
 package com.kenvix.android.exception;
 
-public class ForbiddenOperationException extends RuntimeException {
+public class ForbiddenOperationException extends RequestException {
     public ForbiddenOperationException() {
     }
 

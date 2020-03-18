@@ -1,6 +1,6 @@
 package com.kenvix.android.exception;
 
-public class InvalidAuthorizationException extends RuntimeException {
+public class InvalidAuthorizationException extends RequestException {
     public InvalidAuthorizationException() {
     }
 

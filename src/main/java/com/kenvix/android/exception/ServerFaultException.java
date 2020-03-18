@@ -1,6 +1,6 @@
 package com.kenvix.android.exception;
 
-public class ServerFaultException extends RuntimeException {
+public class ServerFaultException extends RequestException {
     int code;
 
     public ServerFaultException(int code) {

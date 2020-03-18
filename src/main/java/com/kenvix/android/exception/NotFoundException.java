@@ -1,6 +1,6 @@
 package com.kenvix.android.exception;
 
-public class NotFoundException extends RuntimeException {
+public class NotFoundException extends RequestException {
     public NotFoundException() {
     }
 

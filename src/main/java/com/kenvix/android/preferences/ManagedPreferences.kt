@@ -38,6 +38,10 @@ open class ManagedPreferences(
     @SuppressLint("CommitPrefEdits")
     val preferenceEditor = preferences.edit()!!
 
+    /**
+     * This function is running on current thread. if you don't care result
+     * Please use [apply()] instead
+     */
     fun commit() = preferenceEditor.commit()
     fun apply() = preferenceEditor.apply()
     fun clear() {

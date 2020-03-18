@@ -1,6 +1,6 @@
 package com.kenvix.android.exception;
 
-public class TooManyRequestException extends RuntimeException {
+public class TooManyRequestException extends RequestException {
     public TooManyRequestException() {
     }
 

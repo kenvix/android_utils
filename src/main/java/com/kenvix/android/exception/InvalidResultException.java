@@ -1,6 +1,6 @@
 package com.kenvix.android.exception;
 
-public class InvalidResultException extends RuntimeException {
+public class InvalidResultException extends RequestException {
     public InvalidResultException() {
         super("非法返回结果");
     }

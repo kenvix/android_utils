@@ -1,6 +1,6 @@
 package com.kenvix.android.exception;
 
-public class UnknownServerException extends RuntimeException {
+public class UnknownServerException extends RequestException {
     int code;
 
     public UnknownServerException(int code) {

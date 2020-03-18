@@ -1,6 +1,6 @@
 package com.kenvix.android.exception;
 
-public class BadRequestException extends RuntimeException {
+public class BadRequestException extends RequestException {
     public BadRequestException() {
     }
 
