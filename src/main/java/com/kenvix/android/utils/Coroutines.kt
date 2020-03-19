@@ -1,14 +1,14 @@
 package com.kenvix.android.utils
 
 import com.kenvix.android.exception.LifecycleEndException
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.Default
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.future.future
+import java.util.concurrent.CompletableFuture
 import java.util.function.BiConsumer
+import java.util.function.Function
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
 
@@ -50,16 +50,24 @@ class Coroutines : AutoCloseable {
     /**
      * 获取在 Java 代码中调用 Kotlin Suspend 函数所需的最后一个参数 (Continuation)
      * @param onFinished 当suspend函数执行完毕后所调用的回调。若 Throwable 不为 null 则说明执行失败。否则为执行成功
-     * @param dispatcher 协程执行线程的类型。可以为 Dispatchers.Default(CPU密集型) Dispatchers.Main(主线程) Dispatchers.IO(IO密集型)
+     * @param taskDispatcher 协程执行线程的类型。可以为 Dispatchers.Default(CPU密集型) Dispatchers.Main(主线程) Dispatchers.IO(IO密集型)
      */
     @JvmOverloads
-    fun <R> getContinuation(onFinished: BiConsumer<R?, Throwable?>, dispatcher: CoroutineDispatcher = Default): Continuation<R> {
+    fun <R> getContinuation(
+        onFinished: BiConsumer<R?, Throwable?>,
+        taskDispatcher: CoroutineDispatcher = Default,
+        callbackDispatcher: CoroutineDispatcher? = null
+    ): Continuation<R> {
         return object : Continuation<R> {
             override val context: CoroutineContext
-                get() = dispatcher
+                get() = taskDispatcher
 
             override fun resumeWith(result: Result<R>) {
-                onFinished.accept(result.getOrNull(), result.exceptionOrNull())
+                if (callbackDispatcher == null || callbackDispatcher == taskDispatcher)
+                    onFinished.accept(result.getOrNull(), result.exceptionOrNull())
+                else
+                    defaultScope.launch(callbackDispatcher)
+                        { onFinished.accept(result.getOrNull(), result.exceptionOrNull()) }
             }
         }
     }
