@@ -8,6 +8,7 @@ import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.future.future
 import java.util.concurrent.CompletableFuture
 import java.util.function.BiConsumer
+import java.util.function.Consumer
 import java.util.function.Function
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
@@ -39,11 +40,63 @@ class Coroutines : AutoCloseable {
 
     /**
      * 异步运行指定代码（仅用于Java代码）
+     * @param run 要执行的任务
+     * @param taskDispatcher 执行任务的线程（通过 [Dispatchers] 选择你想要的线程）
      */
     @JvmOverloads
-    fun runAsync(run: Call, dispatcher: CoroutineDispatcher = Default) {
-        defaultScope.launch(dispatcher) {
-            run()
+    fun runAsync(run: Consumer<CoroutineScope>, taskDispatcher: CoroutineDispatcher = Default) {
+        defaultScope.launch(taskDispatcher) {
+            run.accept(this)
+        }
+    }
+
+    /**
+     * 异步运行指定代码（仅用于Java代码）
+     * @param run 要执行的任务
+     * @param then 执行完毕后的回调任务
+     * @param taskDispatcher 执行任务的线程（通过 [Dispatchers] 选择你想要的线程）
+     * @param thenDispatcher 执行回调任务的线程（通过 [Dispatchers] 选择你想要的线程）
+     */
+    @JvmOverloads
+    fun runAsync(run: Consumer<CoroutineScope>,
+                 then: Consumer<CoroutineScope>,
+                 taskDispatcher: CoroutineDispatcher = Default,
+                 thenDispatcher: CoroutineDispatcher = Main
+    ) {
+        defaultScope.launch(taskDispatcher) {
+            run.accept(this)
+            withContext(thenDispatcher) { then.accept(this) }
+        }
+    }
+
+    /**
+     * 异步运行指定代码，并返回 [CompletableFuture]（仅用于Java代码）
+     * @param run 要执行的任务
+     * @param taskDispatcher 执行任务的线程（通过 [Dispatchers] 选择你想要的线程）
+     */
+    @JvmOverloads
+    fun <R> runFuture(run: Function<CoroutineScope, R>, taskDispatcher: CoroutineDispatcher = Default) : CompletableFuture<R> {
+        return defaultScope.future(taskDispatcher) {
+            run.apply(this)
+        }
+    }
+
+    /**
+     * 异步运行指定代码，并返回 [CompletableFuture]（仅用于Java代码）
+     * @param run 要执行的任务
+     * @param then 执行完毕后的回调任务
+     * @param taskDispatcher 执行任务的线程（通过 [Dispatchers] 选择你想要的线程）
+     * @param thenDispatcher 执行回调任务的线程（通过 [Dispatchers] 选择你想要的线程）
+     */
+    @JvmOverloads
+    fun <R> runFuture(run: Function<CoroutineScope, R>,
+                      then: Function<CoroutineScope, R>,
+                      taskDispatcher: CoroutineDispatcher = Default,
+                      thenDispatcher: CoroutineDispatcher = Main
+    ) : CompletableFuture<R> {
+        return defaultScope.future(taskDispatcher) {
+            run.apply(this)
+            withContext(thenDispatcher) { then.apply(this) }
         }
     }
 
